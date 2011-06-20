@@ -2,6 +2,9 @@ package com.alleva;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 public class MainActivity extends Activity
 {
@@ -11,5 +14,10 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+//        View theView = (View) findViewById(R.id.wordsView);
+
+
+
     }
 }
