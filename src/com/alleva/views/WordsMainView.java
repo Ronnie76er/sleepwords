@@ -28,8 +28,10 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         private SurfaceHolder _surfaceHolder;
         private int numValue = 0;
         private float size = 0;
-        private int sizeX = 10;
-        private int sizeY = 10;
+        private double sizeX = 10;
+        private double sizeY = 10;
+        private int xpos = 100;
+        private int ypos = 200;
 
         public WordThread(SurfaceHolder surfaceHolder){
             _surfaceHolder = surfaceHolder;
@@ -67,6 +69,9 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
                 try {
                     c = _surfaceHolder.lockCanvas(null);
                     doDraw(c, bm);
+                    sleep(16);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } finally {
                     if(c != null){
                         _surfaceHolder.unlockCanvasAndPost(c);
@@ -82,10 +87,15 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
             clearPaint.setStyle(Paint.Style.FILL);
             c.drawPaint(clearPaint);
 
-            c.drawBitmap(bm, null, new Rect(10, 10, sizeX, sizeY), null);
-            sizeY += 4;
-            sizeX = (sizeY - 10) * 2;
+            int realXPos = getPositionFromMidpoint(xpos, sizeX);
+            int realYPos = getPositionFromMidpoint(ypos, sizeY);
+            int realSizeX = (int)Math.floor(sizeX);
+            int realSizeY = (int)Math.floor(sizeY);
 
+            c.drawBitmap(bm, null, new Rect(realXPos, realYPos, realSizeX, realSizeY), null);
+
+            sizeX = getNewSize(sizeX, 0.01);
+            sizeY = getNewSize(sizeY, 0.01);
 
             try {
                 wait(16);
@@ -94,6 +104,14 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
             }
 
 
+        }
+
+        private double getNewSize(double size, double scale) {
+            return size + (size * scale);
+        }
+
+        private int getPositionFromMidpoint(int centerPosition, double size) {
+            return (int)Math.floor(centerPosition - (size/2));
         }
     }
 
