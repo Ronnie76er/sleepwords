@@ -1,22 +1,15 @@
 package com.alleva.views;
 
 import android.content.Context;
-import android.content.SyncContext;
 import android.graphics.*;
 import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.alleva.R;
 
 import java.util.Random;
-import java.util.logging.LogRecord;
 
 /**
  * User: ronnie
@@ -28,18 +21,23 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
     private Boolean newWord = new Boolean(false);
 
+    private int screenSizeX, screenSizeY;
+
+
     class WordThread extends Thread {
 
         private SurfaceHolder _surfaceHolder;
-        private int numValue = 0;
-        private float size = 0;
         private double sizeX = 10;
         private double sizeY = 10;
         private int xpos = 100;
         private int ypos = 200;
+        private int timePerWordMillis = 5000;
+        private Random random;
 
         public WordThread(SurfaceHolder surfaceHolder) {
             _surfaceHolder = surfaceHolder;
+
+            random = new Random();
         }
 
         @Override
@@ -48,6 +46,10 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
             while (true) {
 
+
+                xpos = random.nextInt(screenSizeX);
+                ypos = random.nextInt(screenSizeY);
+
                 Paint paint = new Paint();
                 Paint clearPaint = new Paint();
                 clearPaint.setColor(Color.BLACK);
@@ -55,7 +57,7 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
 
                 paint.setAntiAlias(true);
-                paint.setTextSize(60);
+                paint.setTextSize(100);
                 paint.setColor(Color.DKGRAY);
                 paint.setAlpha(255);
                 String text = "Some text";
@@ -70,22 +72,28 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
                 testCanvas.drawPaint(clearPaint);
                 testCanvas.drawText(text, 0, bounds.height() - 1, paint);
 
-                sizeY = 10;
+                sizeY = 12;
                 sizeX = sizeY * (bounds.width() / bounds.height());
 
                 newWord = false;
-                messageHandler.postDelayed(newWordTask, 5000);
-
+                messageHandler.postDelayed(newWordTask, timePerWordMillis);
+                int currentAlpha = 255;
                 while (true) {
                     Canvas c = null;
 
                     try {
-                        c = _surfaceHolder.lockCanvas(null);
-                        doDraw(c, bm);
 
                         if (newWord) {
-                            break;
+                            currentAlpha -= 30;
+                            if (currentAlpha < 0) {
+                                break;
+                            }
                         }
+
+                        c = _surfaceHolder.lockCanvas(null);
+                        doDraw(c, bm, currentAlpha);
+
+
                     } finally {
                         if (c != null) {
                             _surfaceHolder.unlockCanvasAndPost(c);
@@ -95,20 +103,22 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
-        private synchronized void doDraw(Canvas c, Bitmap bm) {
+        private synchronized void doDraw(Canvas c, Bitmap bm, int alpha) {
 
             Paint clearPaint = new Paint();
             clearPaint.setColor(Color.BLACK);
             clearPaint.setStyle(Paint.Style.FILL);
             c.drawPaint(clearPaint);
 
+            Paint bitmapPaint = new Paint();
+            bitmapPaint.setAlpha(alpha);
+
             Rect rect = getRectangleFromDimensions(xpos, ypos, sizeX, sizeY);
 
-            c.drawBitmap(bm, null, rect, null);
-            drawSize(c);
+            c.drawBitmap(bm, null, rect, bitmapPaint);
 
-            sizeX = getNewSize(sizeX, 0.02);
-            sizeY = getNewSize(sizeY, 0.02);
+            sizeX = getNewSize(sizeX, 0.015);
+            sizeY = getNewSize(sizeY, 0.015);
 
             try {
                 wait(4);          // about 60 frames/sec
@@ -119,6 +129,7 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
         }
 
+        //for debugging purposes.
         private void drawSize(Canvas c) {
             Paint paint = new Paint();
 
@@ -182,8 +193,20 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
+        Rect thing = surfaceHolder.getSurfaceFrame();
+
+        setScreenSize(thing);
+
         thread.start();
     }
+
+    public void setScreenSize(Rect rect) {
+        screenSizeX = rect.width();
+        screenSizeY = rect.height();
+    }
+
+
 
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
         //To change body of implemented methods use File | Settings | File Templates.
