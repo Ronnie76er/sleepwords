@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">sleepwords</string>
     <string name="test">TESTING!</string>
+    <string name="options">Options</string>
 </resources>
