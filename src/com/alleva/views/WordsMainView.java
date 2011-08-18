@@ -9,6 +9,7 @@ import android.view.SurfaceView;
 import android.view.animation.Animation;
 import android.widget.TextView;
 
+import java.security.PublicKey;
 import java.util.Random;
 
 /**
@@ -33,6 +34,8 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         private int ypos = 200;
         private int timePerWordMillis = 5000;
         private Random random;
+        private volatile boolean keepDrawing;
+        private volatile boolean threadSuspended;
 
         public WordThread(SurfaceHolder surfaceHolder) {
             _surfaceHolder = surfaceHolder;
@@ -46,64 +49,92 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
             while (true) {
 
+                try {
 
-                xpos = random.nextInt(screenSizeX);
-                ypos = random.nextInt(screenSizeY);
-
-                Paint paint = new Paint();
-                Paint clearPaint = new Paint();
-                clearPaint.setColor(Color.BLACK);
-                clearPaint.setStyle(Paint.Style.FILL);
-
-
-                paint.setAntiAlias(true);
-                paint.setTextSize(100);
-                paint.setColor(Color.DKGRAY);
-                paint.setAlpha(255);
-                String text = "Some text";
-
-                Rect bounds = new Rect();
-
-                paint.getTextBounds(text, 0, text.length(), bounds);
-
-                Bitmap bm = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
-                Canvas testCanvas = new Canvas(bm);
-
-                testCanvas.drawPaint(clearPaint);
-                testCanvas.drawText(text, 0, bounds.height() - 1, paint);
-
-                sizeY = 12;
-                sizeX = sizeY * (bounds.width() / bounds.height());
-
-                newWord = false;
-                messageHandler.postDelayed(newWordTask, timePerWordMillis);
-                int currentAlpha = 255;
-                while (true) {
-                    Canvas c = null;
-
-                    try {
-
-                        if (newWord) {
-                            currentAlpha -= 30;
-                            if (currentAlpha < 0) {
-                                break;
-                            }
-                        }
-
-                        c = _surfaceHolder.lockCanvas(null);
-                        doDraw(c, bm, currentAlpha);
-
-
-                    } finally {
-                        if (c != null) {
-                            _surfaceHolder.unlockCanvasAndPost(c);
+                    synchronized (this){
+                        if(threadSuspended){
+                            wait();
                         }
                     }
+
+                    xpos = random.nextInt(screenSizeX);
+                    ypos = random.nextInt(screenSizeY);
+
+                    Paint paint = new Paint();
+                    Paint clearPaint = new Paint();
+                    clearPaint.setColor(Color.BLACK);
+                    clearPaint.setStyle(Paint.Style.FILL);
+
+
+                    paint.setAntiAlias(true);
+                    paint.setTextSize(100);
+                    paint.setColor(Color.DKGRAY);
+                    paint.setAlpha(255);
+                    String text = "Some text";
+
+                    Rect bounds = new Rect();
+
+                    paint.getTextBounds(text, 0, text.length(), bounds);
+
+                    Bitmap bm = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+                    Canvas testCanvas = new Canvas(bm);
+
+                    testCanvas.drawPaint(clearPaint);
+                    testCanvas.drawText(text, 0, bounds.height() - 1, paint);
+
+                    sizeY = 12;
+                    sizeX = sizeY * (bounds.width() / bounds.height());
+
+                    newWord = false;
+                    messageHandler.postDelayed(newWordTask, timePerWordMillis);
+                    int currentAlpha = 255;
+                    while (true) {
+                        Canvas c = null;
+
+                        try {
+
+                            if (newWord) {
+                                currentAlpha -= 30;
+                                if (currentAlpha < 0) {
+                                    break;
+                                }
+                            }
+
+                            c = _surfaceHolder.lockCanvas(null);
+                            doDraw(c, bm, currentAlpha);
+
+
+                        } finally {
+                            if (c != null) {
+                                _surfaceHolder.unlockCanvasAndPost(c);
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
         }
 
+        public synchronized void suspendThread(){
+            threadSuspended = true;
+        }
+
+        public synchronized void resumeThread(){
+            threadSuspended = false;
+            notify();
+        }
+
         private synchronized void doDraw(Canvas c, Bitmap bm, int alpha) {
+
+            if(c == null){
+                try {
+                    wait(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+                return;
+            }
 
             Paint clearPaint = new Paint();
             clearPaint.setColor(Color.BLACK);
@@ -154,6 +185,8 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
             return new Rect(left, top, right, bottom);
         }
+
+
     }
 
     class WordTimingThread extends Thread {
@@ -170,8 +203,6 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-    private TextView textView;
-    private Animation mainAnimation;
     private Handler messageHandler;
     private Runnable newWordTask;
 
@@ -198,7 +229,12 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
         setScreenSize(thing);
 
-        thread.start();
+        System.out.println("Thread starting");
+        if(thread.isAlive()){
+            ((WordThread)thread).resumeThread();
+        } else {
+            thread.start();
+        }
     }
 
     public void setScreenSize(Rect rect) {
@@ -210,11 +246,10 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
 
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        //To change body of implemented methods use File | Settings | File Templates.
+       ((WordThread) thread).suspendThread();
     }
 
 
