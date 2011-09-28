@@ -34,7 +34,6 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         private int ypos = 200;
         private int timePerWordMillis = 5000;
         private Random random;
-        private volatile boolean keepDrawing;
         private volatile boolean threadSuspended;
 
         public WordThread(SurfaceHolder surfaceHolder) {
