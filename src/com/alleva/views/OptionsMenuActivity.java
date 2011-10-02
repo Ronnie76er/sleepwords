@@ -3,6 +3,7 @@ package com.alleva.views;
 import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.widget.ArrayAdapter;
 import com.alleva.R;
 
 /**
