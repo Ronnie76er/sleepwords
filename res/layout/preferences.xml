@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-        android:key="first_preferencescreen">
-    <ListPreference
-            android:key="sleepTimer"
-            android:title="Sleep timer"
-            android:entries="@array/myListArray"
-            android:entryValues="@array/myListValues"/>
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:key="first_preferencescreen">
+    <PreferenceCategory android:title="@string/general_options">
+        <ListPreference
+                android:key="sleepTimer"
+                android:title="@string/sleepTimer_title"
+                android:entries="@array/sleepTimer_entries"
+                android:entryValues="@array/sleepTimer_values"/>
+        <ListPreference
+                android:key="wordTimer"
+                android:title="@string/wordTimer_title"
+                android:summary="@string/wordTimer_summary"
+                android:entries="@array/wordTimer_entries"
+                android:entryValues="@array/wordTimer_values"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>

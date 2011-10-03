@@ -3,6 +3,11 @@
     <string name="app_name">sleepwords</string>
     <string name="test">TESTING!</string>
     <string name="options">Options</string>
-    <string-array name="listArray">
-    </string-array>
+    <string name="general_options">General Options</string>
+
+
+    <string name="sleepTimer_title">Sleep Timer</string>
+
+    <string name="wordTimer_title">Word Timer</string>
+    <string name="wordTimer_summary">How long each word is shown</string>
 </resources>

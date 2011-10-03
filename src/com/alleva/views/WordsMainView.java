@@ -1,8 +1,10 @@
 package com.alleva.views;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.*;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 
 import java.security.PublicKey;
 import java.util.Random;
+import java.util.prefs.Preferences;
 
 /**
  * User: ronnie
@@ -21,8 +24,10 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     private Thread thread;
 
     private Boolean newWord = new Boolean(false);
+    private Boolean sleep = new Boolean(false);
 
     private int screenSizeX, screenSizeY;
+    private int timePerWordMillis;
 
 
     class WordThread extends Thread {
@@ -32,7 +37,6 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         private double sizeY = 10;
         private int xpos = 100;
         private int ypos = 200;
-        private int timePerWordMillis = 5000;
         private Random random;
         private volatile boolean threadSuspended;
 
@@ -47,6 +51,10 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
 
             while (true) {
+
+                if(sleep) {
+                    break;
+                }
 
                 try {
 
@@ -188,20 +196,6 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
     }
 
-    class WordTimingThread extends Thread {
-
-        public void run() {
-            try {
-                sleep(5000);
-                newWord = true;
-            } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
-
-    }
-
-
     private Handler messageHandler;
     private Runnable newWordTask;
 
@@ -215,11 +209,17 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
         messageHandler = new Handler();
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        timePerWordMillis = Integer.parseInt(prefs.getString("wordTimer", "5")) * 1000;
+
         newWordTask = new Runnable() {
             public void run() {
                 newWord = true;
             }
         };
+
+
     }
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {

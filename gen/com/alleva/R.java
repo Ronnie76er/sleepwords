@@ -12,9 +12,10 @@ public final class R {
         public static final int mainanimation=0x7f040000;
     }
     public static final class array {
-        public static final int listArray=0x7f050002;
-        public static final int myListArray=0x7f050000;
-        public static final int myListValues=0x7f050001;
+        public static final int sleepTimer_entries=0x7f050000;
+        public static final int sleepTimer_values=0x7f050001;
+        public static final int wordTimer_entries=0x7f050002;
+        public static final int wordTimer_values=0x7f050003;
     }
     public static final class attr {
     }
@@ -36,7 +37,11 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f060000;
+        public static final int general_options=0x7f060003;
         public static final int options=0x7f060002;
+        public static final int sleepTimer_title=0x7f060004;
         public static final int test=0x7f060001;
+        public static final int wordTimer_summary=0x7f060006;
+        public static final int wordTimer_title=0x7f060005;
     }
 }
