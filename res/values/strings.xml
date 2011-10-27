@@ -12,4 +12,5 @@
     <string name="wordTimer_summary">How long each word is shown</string>
 
     <string name="wordPosition_title">Word Position</string>
+    <string name="wordSpeed_title">Word Speed</string>
 </resources>

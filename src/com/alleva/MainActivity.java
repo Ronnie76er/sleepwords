@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import com.alleva.views.OptionsMenuActivity;
 
 public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener
@@ -17,6 +18,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     private int sleepTimeMillis;
     private Runnable sleepTask;
     private Handler messageHandler;
+
 
 
     /** Called when the activity is first created. */
@@ -30,6 +32,7 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         sleepTimeMillis = Integer.parseInt(prefs.getString("sleepTimer","1")) * 60 * 1000;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         sleepTask = new Runnable() {
             public void run() {
@@ -52,10 +55,8 @@ public class MainActivity extends Activity implements SharedPreferences.OnShared
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.optionMenuButton){
-
             Intent intent = new Intent(this, OptionsMenuActivity.class);
             startActivity(intent);
-            messageHandler.removeCallbacks(sleepTask);
         }
         return super.onOptionsItemSelected(item);
     }

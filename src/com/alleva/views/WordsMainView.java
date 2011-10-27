@@ -29,6 +29,10 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     private final int RANDOM_POSITION = 0;
     private final int CENTER_POSITION = 1;
 
+    private final double FAST = 0.015;
+    private final double MEDIUM = 0.01;
+    private final double SLOW = 0.008;
+
     private Boolean newWord = new Boolean(false);
     private Boolean sleep = new Boolean(false);
 
@@ -37,6 +41,7 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     private String[] nouns;
     private int nounsLength;
     private int wordPosition = RANDOM_POSITION;
+    private double wordSpeed;
 
 
     class WordThread extends Thread {
@@ -174,8 +179,8 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
             c.drawBitmap(bm, null, rect, bitmapPaint);
 
-            sizeX = getNewSize(sizeX, 0.015);
-            sizeY = getNewSize(sizeY, 0.015);
+            sizeX = getNewSize(sizeX, wordSpeed);
+            sizeY = getNewSize(sizeY, wordSpeed);
 
             try {
                 wait(4);          // about 60 frames/sec
@@ -231,7 +236,9 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        timePerWordMillis = Integer.parseInt(prefs.getString("wordTimer", "5")) * 1000;
+        timePerWordMillis = getWordTimer(prefs);
+        wordPosition = getWordPosition(prefs);
+        wordSpeed = getWordSpeed(prefs);
 
         newWordTask = new Runnable() {
             public void run() {
@@ -240,13 +247,38 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         };
     }
 
+    private int getWordTimer(SharedPreferences prefs) {
+        return Integer.parseInt(prefs.getString("wordTimer", "5")) * 1000;
+    }
+
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals("wordTimer"))
-            timePerWordMillis = Integer.parseInt(sharedPreferences.getString("wordTimer", "5")) * 1000;
+            timePerWordMillis = getWordTimer(sharedPreferences);
 
         if (s.equals("wordPosition"))
-            wordPosition = sharedPreferences.getString("wordPosition", "random").equals("random") ? RANDOM_POSITION : CENTER_POSITION;
+            wordPosition = getWordPosition(sharedPreferences);
+        
+        if(s.equals("wordSpeed"))
+            wordSpeed =  getWordSpeed(sharedPreferences);
 
+    }
+
+    private double getWordSpeed(SharedPreferences sharedPreferences) {
+        String speedString = sharedPreferences.getString("wordSpeed", "slow");
+        double speed;
+
+        if(speedString.equals("fast"))
+            speed = FAST;
+        else if(speedString.equals("medium"))
+            speed = MEDIUM;
+        else
+            speed = SLOW;
+
+        return speed;
+    }
+
+    private int getWordPosition(SharedPreferences sharedPreferences) {
+        return sharedPreferences.getString("wordPosition", "random").equals("random") ? RANDOM_POSITION : CENTER_POSITION;
     }
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {

@@ -23,6 +23,12 @@
                 android:entries="@array/wordPosition_entries"
                 android:entryValues="@array/wordPosition_values"
                 android:defaultValue="random"/>
+        <ListPreference
+                android:key="wordSpeed"
+                android:title="@string/wordSpeed_title"
+                android:entries="@array/wordSpeed_entries"
+                android:entryValues="@array/wordSpeed_values"
+                android:defaultValue="slow"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

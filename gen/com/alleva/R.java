@@ -12,11 +12,13 @@ public final class R {
         public static final int mainanimation=0x7f040000;
     }
     public static final class array {
-        public static final int nouns=0x7f050006;
+        public static final int nouns=0x7f050008;
         public static final int sleepTimer_entries=0x7f050000;
         public static final int sleepTimer_values=0x7f050001;
         public static final int wordPosition_entries=0x7f050004;
         public static final int wordPosition_values=0x7f050005;
+        public static final int wordSpeed_entries=0x7f050006;
+        public static final int wordSpeed_values=0x7f050007;
         public static final int wordTimer_entries=0x7f050002;
         public static final int wordTimer_values=0x7f050003;
     }
@@ -24,7 +26,6 @@ public final class R {
     }
     public static final class drawable {
         public static final int icon=0x7f020000;
-        public static final int menu_standard=0x7f020001;
     }
     public static final class id {
         public static final int optionMenuButton=0x7f080002;
@@ -46,6 +47,7 @@ public final class R {
         public static final int sleepTimer_title=0x7f060004;
         public static final int test=0x7f060001;
         public static final int wordPosition_title=0x7f060007;
+        public static final int wordSpeed_title=0x7f060008;
         public static final int wordTimer_summary=0x7f060006;
         public static final int wordTimer_title=0x7f060005;
     }
