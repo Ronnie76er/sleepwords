@@ -11,7 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.alleva.views.OptionsMenuActivity;
 
-public class MainActivity extends Activity
+public class MainActivity extends Activity implements SharedPreferences.OnSharedPreferenceChangeListener
 {
 
     private int sleepTimeMillis;
@@ -55,8 +55,15 @@ public class MainActivity extends Activity
 
             Intent intent = new Intent(this, OptionsMenuActivity.class);
             startActivity(intent);
-
+            messageHandler.removeCallbacks(sleepTask);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        messageHandler.removeCallbacks(sleepTask);
+        sleepTimeMillis = Integer.parseInt(sharedPreferences.getString("sleepTimer","1")) * 60 * 1000;
+
+        messageHandler.postDelayed(sleepTask, sleepTimeMillis);
     }
 }

@@ -12,6 +12,7 @@ public final class R {
         public static final int mainanimation=0x7f040000;
     }
     public static final class array {
+        public static final int nouns=0x7f050004;
         public static final int sleepTimer_entries=0x7f050000;
         public static final int sleepTimer_values=0x7f050001;
         public static final int wordTimer_entries=0x7f050002;

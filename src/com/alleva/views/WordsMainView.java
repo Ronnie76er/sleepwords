@@ -19,7 +19,7 @@ import java.util.prefs.Preferences;
  * User: ronnie
  * Date: 6/19/11
  */
-public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback {
+public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private Thread thread;
 
@@ -28,7 +28,6 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
     private int screenSizeX, screenSizeY;
     private int timePerWordMillis;
-
 
     class WordThread extends Thread {
 
@@ -52,14 +51,14 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
             while (true) {
 
-                if(sleep) {
+                if (sleep) {
                     break;
                 }
 
                 try {
 
-                    synchronized (this){
-                        if(threadSuspended){
+                    synchronized (this) {
+                        if (threadSuspended) {
                             wait();
                         }
                     }
@@ -123,18 +122,18 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
-        public synchronized void suspendThread(){
+        public synchronized void suspendThread() {
             threadSuspended = true;
         }
 
-        public synchronized void resumeThread(){
+        public synchronized void resumeThread() {
             threadSuspended = false;
             notify();
         }
 
         private synchronized void doDraw(Canvas c, Bitmap bm, int alpha) {
 
-            if(c == null){
+            if (c == null) {
                 try {
                     wait(200);
                 } catch (InterruptedException e) {
@@ -210,6 +209,7 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         messageHandler = new Handler();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
         timePerWordMillis = Integer.parseInt(prefs.getString("wordTimer", "5")) * 1000;
 
@@ -218,8 +218,14 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
                 newWord = true;
             }
         };
+    }
 
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if(!s.equals("wordTimer"))
+            return;
 
+        timePerWordMillis = Integer.parseInt(sharedPreferences.getString("wordTimer", "5")) * 1000;
+        System.out.println("timePerWordMillis = " + timePerWordMillis);
     }
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
@@ -228,11 +234,11 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
         setScreenSize(thing);
 
-        System.out.println("Thread starting");
-        if(thread.isAlive()){
-            ((WordThread)thread).resumeThread();
+        if (thread.isAlive()) {
+            ((WordThread) thread).resumeThread();
         } else {
             thread.start();
+
         }
     }
 
@@ -242,13 +248,11 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-
-
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
     }
 
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-       ((WordThread) thread).suspendThread();
+        ((WordThread) thread).suspendThread();
     }
 
 
