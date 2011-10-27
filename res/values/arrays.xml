@@ -23,6 +23,16 @@
         <item>5</item>
         <item>10</item>
     </string-array>
+
+    <string-array name="wordPosition_entries">
+        <item>Center</item>
+        <item>Random</item>
+    </string-array>
+    <string-array name="wordPosition_values">
+        <item>center</item>
+        <item>random</item>
+    </string-array>
+
     <string-array name="nouns">
         <item>account</item>
         <item>achiever</item>

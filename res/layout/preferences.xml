@@ -8,13 +8,21 @@
                 android:key="sleepTimer"
                 android:title="@string/sleepTimer_title"
                 android:entries="@array/sleepTimer_entries"
-                android:entryValues="@array/sleepTimer_values"/>
+                android:entryValues="@array/sleepTimer_values"
+                android:defaultValue="5"/>
         <ListPreference
                 android:key="wordTimer"
                 android:title="@string/wordTimer_title"
                 android:summary="@string/wordTimer_summary"
                 android:entries="@array/wordTimer_entries"
-                android:entryValues="@array/wordTimer_values"/>
+                android:entryValues="@array/wordTimer_values"
+                android:defaultValue="5"/>
+        <ListPreference
+                android:key="wordPosition"
+                android:title="@string/wordPosition_title"
+                android:entries="@array/wordPosition_entries"
+                android:entryValues="@array/wordPosition_values"
+                android:defaultValue="random"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

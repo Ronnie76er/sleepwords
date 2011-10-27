@@ -2,6 +2,7 @@ package com.alleva.views;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.*;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -10,9 +11,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.animation.Animation;
 import android.widget.TextView;
+import com.alleva.R;
 
 import java.security.PublicKey;
 import java.util.Random;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 /**
@@ -23,11 +26,18 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
 
     private Thread thread;
 
+    private final int RANDOM_POSITION = 0;
+    private final int CENTER_POSITION = 1;
+
     private Boolean newWord = new Boolean(false);
     private Boolean sleep = new Boolean(false);
 
     private int screenSizeX, screenSizeY;
     private int timePerWordMillis;
+    private String[] nouns;
+    private int nounsLength;
+    private int wordPosition = RANDOM_POSITION;
+
 
     class WordThread extends Thread {
 
@@ -39,8 +49,13 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
         private Random random;
         private volatile boolean threadSuspended;
 
+
         public WordThread(SurfaceHolder surfaceHolder) {
             _surfaceHolder = surfaceHolder;
+
+            Resources res = getResources();
+            nouns = res.getStringArray(R.array.nouns);
+            nounsLength = nouns.length;
 
             random = new Random();
         }
@@ -63,8 +78,13 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
                         }
                     }
 
-                    xpos = random.nextInt(screenSizeX);
-                    ypos = random.nextInt(screenSizeY);
+                    if (wordPosition == RANDOM_POSITION) {
+                        xpos = random.nextInt(screenSizeX - 80) + 40;
+                        ypos = random.nextInt(screenSizeY - 50) + 25;
+                    } else {
+                        xpos = screenSizeX / 2;
+                        ypos = screenSizeY / 2;
+                    }
 
                     Paint paint = new Paint();
                     Paint clearPaint = new Paint();
@@ -76,13 +96,13 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
                     paint.setTextSize(100);
                     paint.setColor(Color.DKGRAY);
                     paint.setAlpha(255);
-                    String text = "Some text";
+                    String text = nouns[random.nextInt(nounsLength)];
 
                     Rect bounds = new Rect();
 
                     paint.getTextBounds(text, 0, text.length(), bounds);
 
-                    Bitmap bm = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+                    Bitmap bm = Bitmap.createBitmap(bounds.width() + 10, bounds.height() + 30, Bitmap.Config.ARGB_8888);
                     Canvas testCanvas = new Canvas(bm);
 
                     testCanvas.drawPaint(clearPaint);
@@ -221,11 +241,12 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if(!s.equals("wordTimer"))
-            return;
+        if (s.equals("wordTimer"))
+            timePerWordMillis = Integer.parseInt(sharedPreferences.getString("wordTimer", "5")) * 1000;
 
-        timePerWordMillis = Integer.parseInt(sharedPreferences.getString("wordTimer", "5")) * 1000;
-        System.out.println("timePerWordMillis = " + timePerWordMillis);
+        if (s.equals("wordPosition"))
+            wordPosition = sharedPreferences.getString("wordPosition", "random").equals("random") ? RANDOM_POSITION : CENTER_POSITION;
+
     }
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {

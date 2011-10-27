@@ -10,4 +10,6 @@
 
     <string name="wordTimer_title">Word Timer</string>
     <string name="wordTimer_summary">How long each word is shown</string>
+
+    <string name="wordPosition_title">Word Position</string>
 </resources>
