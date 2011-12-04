@@ -183,7 +183,7 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
             sizeY = getNewSize(sizeY, wordSpeed);
 
             try {
-                wait(4);          // about 60 frames/sec
+                wait(16);          // about 60 frames/sec
             } catch (InterruptedException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
