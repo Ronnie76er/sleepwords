@@ -24,6 +24,7 @@ import java.util.prefs.Preferences;
  */
 public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback, SharedPreferences.OnSharedPreferenceChangeListener {
 
+    public static final int STARTING_HEIGHT = 25;
     private Thread thread;
 
     private final int RANDOM_POSITION = 0;
@@ -113,7 +114,7 @@ public class WordsMainView extends SurfaceView implements SurfaceHolder.Callback
                     testCanvas.drawPaint(clearPaint);
                     testCanvas.drawText(text, 0, bounds.height() - 1, paint);
 
-                    sizeY = 12;
+                    sizeY = STARTING_HEIGHT;
                     sizeX = sizeY * (bounds.width() / bounds.height());
 
                     newWord = false;
